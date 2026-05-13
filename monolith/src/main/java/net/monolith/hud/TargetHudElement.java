@@ -96,7 +96,7 @@ public class TargetHudElement extends HudElement {
       renderer.roundedRect((float)x, (float)y, (float)size, (float)size, 6.0F, Math.min(140, alpha) << 24 | 1182493);
       renderer.roundedOutline((float)x, (float)y, (float)size, (float)size, 6.0F, 1.0F, Math.min(95, alpha) << 24 | 58879);
       if (entity instanceof AbstractClientPlayerEntity player) {
-         context.drawTexture(RenderLayer::getGuiTextured, player.getSkinTextures().comp_1626(), x + 4, y + 4, 8.0F, 8.0F, size - 8, size - 8, 64, 64);
+         context.drawTexture(RenderLayer::getGuiTextured, player.getSkinTextures().texture(), x + 4, y + 4, 8.0F, 8.0F, size - 8, size - 8, 64, 64);
       } else {
          String shortName = entity.getName().getString();
          String letter = shortName.isEmpty() ? "?" : shortName.substring(0, 1).toUpperCase(Locale.ROOT);

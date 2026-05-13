@@ -30,7 +30,7 @@ public class PotionHudElement extends HudElement {
       MinecraftClient mc = MinecraftClient.getInstance();
       if (mc.player != null) {
          List<StatusEffectInstance> effects = new ArrayList<>(mc.player.getStatusEffects());
-         effects.sort(Comparator.comparing(effectx -> ((StatusEffect)effectx.getEffectType().comp_349()).getName().getString().toLowerCase(Locale.ROOT)));
+         effects.sort(Comparator.comparing(effectx -> ((StatusEffect)effectx.getEffectType().value()).getName().getString().toLowerCase(Locale.ROOT)));
          boolean isChatOpen = mc.currentScreen instanceof ChatScreen;
          boolean visible = !effects.isEmpty() || isChatOpen;
          this.alphaAnim = RenderUtils.lerp(this.alphaAnim, visible ? 1.0F : 0.0F, 0.3F * Math.max(1.0F, tickDelta));
@@ -56,7 +56,7 @@ public class PotionHudElement extends HudElement {
                this.renderPotionRow(context, renderer, mc, "Preview", "10", "**:**", this.previewIcon(), rowY, text, levelColor, bg);
             } else {
                for (StatusEffectInstance effect : effects) {
-                  String name = ((StatusEffect)effect.getEffectType().comp_349()).getName().getString();
+                  String name = ((StatusEffect)effect.getEffectType().value()).getName().getString();
                   String level = String.valueOf(effect.getAmplifier() + 1);
                   String duration = this.formatDuration(effect.getDuration() / 20);
                   this.renderPotionRow(context, renderer, mc, name, level, duration, this.icon(effect), rowY, text, levelColor, bg);
@@ -98,7 +98,7 @@ public class PotionHudElement extends HudElement {
          return Math.max(max, (float)(mc.textRenderer.getWidth("Preview") + mc.textRenderer.getWidth("10") + mc.textRenderer.getWidth("**:**") + 38));
       } else {
          for (StatusEffectInstance effect : effects) {
-            String name = ((StatusEffect)effect.getEffectType().comp_349()).getName().getString();
+            String name = ((StatusEffect)effect.getEffectType().value()).getName().getString();
             String level = String.valueOf(effect.getAmplifier() + 1);
             String duration = this.formatDuration(effect.getDuration() / 20);
             max = Math.max(max, (float)(mc.textRenderer.getWidth(name) + mc.textRenderer.getWidth(level) + mc.textRenderer.getWidth(duration) + 38));
@@ -110,7 +110,7 @@ public class PotionHudElement extends HudElement {
 
    private Identifier icon(StatusEffectInstance effect) {
       RegistryEntry<?> entry = effect.getEffectType();
-      Identifier id = Registries.STATUS_EFFECT.getId((StatusEffect)entry.comp_349());
+      Identifier id = Registries.STATUS_EFFECT.getId((StatusEffect)entry.value());
       return Identifier.of("minecraft", "textures/mob_effect/" + id.getPath() + ".png");
    }
 

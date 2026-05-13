@@ -81,15 +81,6 @@ public final class Arrows {
       matrices.push();
       matrices.translate(x, y, 0.0F);
       matrices.multiply(RotationAxis.POSITIVE_Z.rotationDegrees(angle));
-      if (design.equals("Celestial")) {
-         r.circle(0.0F, 0.0F, size * 0.62F, 570425344 | color & 16777215);
-      } else if (design.equals("Nursultan")) {
-         r.circle(0.0F, 0.0F, size * 0.7F, 637593087);
-         r.circle(0.0F, 0.0F, size * 0.42F, 402653184);
-      } else {
-         r.circle(0.0F, 0.0F, size * 0.58F, 570425344);
-      }
-
       int drawSize = Math.round(size);
       r.texture(ARROW, -drawSize / 2, -drawSize / 2, drawSize, drawSize, color);
       matrices.pop();

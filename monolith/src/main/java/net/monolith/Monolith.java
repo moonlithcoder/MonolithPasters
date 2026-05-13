@@ -32,9 +32,9 @@ import net.monolith.visual.Nametags;
 import net.monolith.visual.Prediction;
 import net.monolith.visual.StorageEsp;
 import net.monolith.visual.TargetEsp;
-import net.monolith.visual.TargetGlow;
 import net.monolith.visual.Trails;
 import net.monolith.visual.WorldRender;
+import net.monolith.visual.WorldParticles;
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -53,8 +53,8 @@ public class Monolith implements ClientModInitializer {
          OptimizationManager.tick(client);
          WorldRender.tick(client);
          TargetEsp.tick();
-         TargetGlow.tick();
          AttackAura.tick(client);
+         WorldParticles.tick();
          RotationManager.tick();
          ConfigManager.autoSaveTick();
          this.handleHudKeybind(client);
@@ -67,17 +67,25 @@ public class Monolith implements ClientModInitializer {
          }
       });
       HudRenderCallback.EVENT.register((HudRenderCallback)(context, tickDelta) -> {
-         HudManager.render(context, tickDelta.getTickDelta(true));
-         Arrows.render(context, tickDelta.getTickDelta(true));
+         try {
+            HudManager.render(context, tickDelta.getTickDelta(true));
+            Arrows.render(context, tickDelta.getTickDelta(true));
+         } catch (RuntimeException exception) {
+            LOGGER.warn("HUD render skipped", exception);
+         }
       });
       WorldRenderEvents.LAST.register((Last)context -> {
-         Esp.render(context);
-         TargetEsp.render(context);
-         TargetGlow.render(context);
-         Trails.render(context);
-         Prediction.render(context);
-         StorageEsp.render(context);
-         Nametags.render(context);
+         try {
+            Esp.render(context);
+            TargetEsp.render(context);
+            Trails.render(context);
+            WorldParticles.render(context);
+            Prediction.render(context);
+            StorageEsp.render(context);
+            Nametags.render(context);
+         } catch (RuntimeException exception) {
+            LOGGER.warn("World render skipped", exception);
+         }
       });
       ClientSendMessageEvents.ALLOW_CHAT.register((AllowChat)message -> !ConfigManager.handleChat(message));
       ScreenEvents.AFTER_INIT

@@ -12,6 +12,7 @@ import java.util.Set;
 public class Module {
    public String name;
    public String category;
+   public String description;
    public boolean enabled;
    public List<String> modes = new ArrayList<>();
    public String currentMode = "";
@@ -27,8 +28,13 @@ public class Module {
    public float hoverAnim = 0.0F;
 
    public Module(String name, String category) {
+      this(name, category, "");
+   }
+
+   public Module(String name, String category, String description) {
       this.name = name;
       this.category = category;
+      this.description = description;
       this.enabled = false;
    }
 
@@ -44,12 +50,24 @@ public class Module {
       }
    }
 
-   public void addSetting(String name, double value, double min, double max, double step) {
-      this.settings.put(name, new Module.Setting(name, value, min, max, step));
+   public Module.Setting addSetting(String name, double value, double min, double max, double step) {
+      return this.addSetting(name, value, min, max, step, "");
    }
 
-   public void addColorSetting(String name, int rgb) {
-      this.settings.put(name, new Module.Setting(name, (double)rgb, 0.0, 1.6777215E7, 1.0, true));
+   public Module.Setting addSetting(String name, double value, double min, double max, double step, String description) {
+      Module.Setting setting = new Module.Setting(name, value, min, max, step, false, description);
+      this.settings.put(name, setting);
+      return setting;
+   }
+
+   public Module.Setting addColorSetting(String name, int rgb) {
+      return this.addColorSetting(name, rgb, "");
+   }
+
+   public Module.Setting addColorSetting(String name, int rgb, String description) {
+      Module.Setting setting = new Module.Setting(name, (double)rgb, 0.0, 1.6777215E7, 1.0, true, description);
+      this.settings.put(name, setting);
+      return setting;
    }
 
    public Module.Setting getSetting(String name) {
@@ -62,7 +80,13 @@ public class Module {
    }
 
    public Module.OptionSetting addOptionSetting(String name, boolean multiple, String selected, String... options) {
-      Module.OptionSetting setting = new Module.OptionSetting(name, multiple, selected, options);
+      Module.OptionSetting setting = new Module.OptionSetting(name, multiple, selected, "", options);
+      this.optionSettings.add(setting);
+      return setting;
+   }
+
+   public Module.OptionSetting addOptionSettingDescription(String name, boolean multiple, String selected, String description, String... options) {
+      Module.OptionSetting setting = new Module.OptionSetting(name, multiple, selected, description, options);
       this.optionSettings.add(setting);
       return setting;
    }
@@ -90,12 +114,18 @@ public class Module {
    public static final class OptionSetting {
       public final String name;
       public final boolean multiple;
+      public final String description;
       public final List<String> options;
       public final Set<String> selected = new LinkedHashSet<>();
 
       public OptionSetting(String name, boolean multiple, String selected, String... options) {
+         this(name, multiple, selected, "", options);
+      }
+
+      public OptionSetting(String name, boolean multiple, String selected, String description, String... options) {
          this.name = name;
          this.multiple = multiple;
+         this.description = description;
          this.options = new ArrayList<>(Arrays.asList(options));
          if (this.options.contains(selected)) {
             this.selected.add(selected);
@@ -134,18 +164,24 @@ public class Module {
       public final double max;
       public final double step;
       public final boolean color;
+      public final String description;
       public double value;
 
       public Setting(String name, double value, double min, double max, double step) {
-         this(name, value, min, max, step, false);
+         this(name, value, min, max, step, false, "");
       }
 
       public Setting(String name, double value, double min, double max, double step, boolean color) {
+         this(name, value, min, max, step, color, "");
+      }
+
+      public Setting(String name, double value, double min, double max, double step, boolean color, String description) {
          this.name = name;
          this.min = min;
          this.max = max;
          this.step = step;
          this.color = color;
+         this.description = description;
          this.set(value);
       }
 

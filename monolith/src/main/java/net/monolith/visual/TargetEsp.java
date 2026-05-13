@@ -46,8 +46,9 @@ public final class TargetEsp {
    public static void render(WorldRenderContext context) {
       Module module = ModuleManager.getModule("TargetESP");
       LivingEntity target = AttackAura.target();
-      if (module != null && module.enabled) {
-         ClientPlayerEntity player = MinecraftClient.getInstance().player;
+      MinecraftClient client = MinecraftClient.getInstance();
+      if (module != null && module.enabled && client.world != null) {
+         ClientPlayerEntity player = client.player;
          if (target == null || target == player) {
             animation = Math.max(0.0F, animation - 0.12F);
          } else if (player != null) {
@@ -61,12 +62,18 @@ public final class TargetEsp {
             lastTarget = null;
          } else if (lastTarget != null) {
             float tickDelta = context.tickCounter().getTickDelta(true);
-            if ("Призраки".equals(module.currentMode)) {
-               drawGhosts(context.matrixStack(), context.camera(), tickDelta);
-            } else {
-               drawMarker(context.matrixStack(), context.camera(), tickDelta);
+            try {
+               if ("Призраки".equals(module.currentMode)) {
+                  drawGhosts(context.matrixStack(), context.camera(), tickDelta);
+               } else {
+                  drawMarker(context.matrixStack(), context.camera(), tickDelta);
+               }
+            } catch (RuntimeException ignored) {
+               resetState();
             }
          }
+      } else {
+         resetState();
       }
    }
 
@@ -157,6 +164,12 @@ public final class TargetEsp {
       RenderSystem.disableBlend();
       RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
       RenderSystem.enableCull();
+   }
+
+   private static void resetState() {
+      lastTarget = null;
+      animation = 0.0F;
+      rotationSpeed = 0.0F;
    }
 
    private static void drawBillboard(MatrixStack matrices, Camera camera, Vec3d camPos, double x, double y, double z, float size, int color) {

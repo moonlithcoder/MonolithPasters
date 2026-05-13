@@ -29,6 +29,9 @@ public final class StorageEsp {
             for (int cz = playerChunkZ - chunkRange; cz <= playerChunkZ + chunkRange; cz++) {
                if (client.world.isChunkLoaded(cx, cz)) {
                   WorldChunk chunk = client.world.getChunk(cx, cz);
+                  if (chunk == null) {
+                     continue;
+                  }
 
                   for (BlockEntity blockEntity : chunk.getBlockEntities().values()) {
                      if (isStorage(blockEntity)) {

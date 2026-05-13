@@ -5,6 +5,7 @@ import com.mojang.blaze3d.platform.GlStateManager.SrcFactor;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.minecraft.client.gl.ShaderProgramKeys;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.client.render.BufferRenderer;
@@ -496,13 +497,11 @@ public final class Render3D {
          this.matrices.multiply(new Quaternionf(this.cameraObject.getRotation()));
          this.matrices.scale(-scale, -scale, scale);
          Matrix4f matrix = this.matrices.peek().getPositionMatrix();
-         float width = (float)textRenderer.getWidth(Render2D.styledText(line)) / 2.0F;
-         String pad = "  " + line + "  ";
-         float paddedWidth = (float)textRenderer.getWidth(Render2D.styledText(pad)) / 2.0F;
-         textRenderer.draw(
-            Render2D.styledText(pad), -paddedWidth, -1.0F, textColor, false, matrix, consumers, TextLayerType.SEE_THROUGH, backgroundColor, 15728880
-         );
-         textRenderer.draw(Render2D.styledText(line), -width, -1.0F, textColor, false, matrix, consumers, TextLayerType.SEE_THROUGH, 0, 15728880);
+         Text styled = Text.literal(line);
+         float width = (float)textRenderer.getWidth(styled);
+         int left = (int)(-width / 2.0F) - 5;
+         this.roundedQuad2d(matrix, (float)left, -5.0F, width + 10.0F, 14.0F, 2.0F, backgroundColor);
+         textRenderer.draw(styled, -width / 2.0F, -1.0F, textColor, false, matrix, consumers, TextLayerType.SEE_THROUGH, 0, 15728880);
          consumers.draw();
          this.matrices.pop();
       }
@@ -557,6 +556,7 @@ public final class Render3D {
          BufferRenderer.drawWithGlobalProgram(builder.end());
          RenderSystem.depthMask(true);
          RenderSystem.enableDepthTest();
+         RenderSystem.defaultBlendFunc();
          this.teardown();
       }
    }
@@ -571,6 +571,7 @@ public final class Render3D {
          BufferBuilder builder = Tessellator.getInstance().begin(DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
          drawer.draw(builder);
          BufferRenderer.drawWithGlobalProgram(builder.end());
+         RenderSystem.depthMask(true);
          this.teardown();
       }
    }
@@ -586,6 +587,8 @@ public final class Render3D {
          BufferBuilder builder = Tessellator.getInstance().begin(DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
          drawer.draw(builder);
          BufferRenderer.drawWithGlobalProgram(builder.end());
+         RenderSystem.depthMask(true);
+         RenderSystem.defaultBlendFunc();
          this.teardown();
       }
    }
@@ -600,7 +603,10 @@ public final class Render3D {
 
    private void teardown() {
       RenderSystem.depthMask(true);
+      RenderSystem.enableDepthTest();
+      RenderSystem.defaultBlendFunc();
       RenderSystem.enableCull();
+      RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
    }
 
    private void addLineVertex(BufferBuilder builder, double x, double y, double z, int color) {
@@ -633,6 +639,28 @@ public final class Render3D {
       this.addVertex(builder, x2, y2, z2, color);
       this.addVertex(builder, x3, y3, z3, color);
       this.addVertex(builder, x4, y4, z4, color);
+   }
+
+   private void roundedQuad2d(Matrix4f matrix, float x, float y, float width, float height, float radius, int color) {
+      if (alpha(color) > 0) {
+         this.setup();
+         BufferBuilder builder = Tessellator.getInstance().begin(DrawMode.TRIANGLE_FAN, VertexFormats.POSITION_COLOR);
+         builder.vertex(matrix, x + width / 2.0F, y + height / 2.0F, 0.0F).color(color);
+         this.arc2d(builder, matrix, x + width - radius, y + radius, radius, -90.0F, 0.0F, color);
+         this.arc2d(builder, matrix, x + width - radius, y + height - radius, radius, 0.0F, 90.0F, color);
+         this.arc2d(builder, matrix, x + radius, y + height - radius, radius, 90.0F, 180.0F, color);
+         this.arc2d(builder, matrix, x + radius, y + radius, radius, 180.0F, 270.0F, color);
+         builder.vertex(matrix, x + width - radius, y, 0.0F).color(color);
+         BufferRenderer.drawWithGlobalProgram(builder.end());
+         this.teardown();
+      }
+   }
+
+   private void arc2d(BufferBuilder builder, Matrix4f matrix, float centerX, float centerY, float radius, float start, float end, int color) {
+      for (int i = 0; i <= 6; i++) {
+         float angle = (float)Math.toRadians((double)(start + (end - start) * (float)i / 6.0F));
+         builder.vertex(matrix, centerX + (float)Math.cos((double)angle) * radius, centerY + (float)Math.sin((double)angle) * radius, 0.0F).color(color);
+      }
    }
 
    private void ribbonVertex(BufferBuilder builder, Vec3d pos, int color) {
