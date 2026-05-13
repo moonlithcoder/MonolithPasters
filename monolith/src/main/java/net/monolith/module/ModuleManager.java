@@ -57,9 +57,15 @@ public class ModuleManager {
       arrows.addSetting("Size", 18.0, 10.0, 32.0, 1.0, "Размер стрелок.");
       arrows.addOptionSettingDescription("Design", false, "Client", "Стиль окраски стрелок.", "Client", "Celestial", "Nursultan");
       modules.add(arrows);
-      Module particles = new Module("World particles", "Visuals", "Создает частицы вокруг цели после удара.");
-      particles.addOptionSettingDescription("Вид", false, "Сердечки", "Форма частиц после удара.", "Сердечки", "Орбизы", "Молния", "Снежинки");
-      particles.addSetting("Кол-во за удар", 20.0, 1.0, 50.0, 1.0, "Сколько частиц создавать после каждого удара.");
+      Module particles = new Module("World particles", "Visuals", "Создает падающие с неба частицы вокруг игрока.");
+      particles.addOptionSettingDescription("Вид", false, "Звезды", "Форма падающих частиц.", "Звезды", "Снег", "Блум", "Сердечки", "Молния");
+      particles.addSetting("Макс количество", 50.0, 10.0, 200.0, 1.0, "Максимум падающих частиц.");
+      particles.addSetting("Спавн/сек", 15.0, 1.0, 80.0, 1.0, "Сколько частиц появляется в секунду.");
+      particles.addSetting("Высота спавна", 10.0, 2.0, 30.0, 1.0, "Насколько высоко над игроком появляются частицы.");
+      particles.addSetting("Радиус спавна", 25.0, 5.0, 50.0, 1.0, "Радиус появления вокруг игрока.");
+      particles.addSetting("Размер", 1.0, 0.5, 2.0, 0.1, "Размер падающих частиц.");
+      particles.addSetting("Время жизни", 1800.0, 500.0, 5000.0, 100.0, "Сколько живет частица в миллисекундах.");
+      particles.addSetting("Гравитация", 1.0, 0.1, 5.0, 0.1, "Скорость падения вниз.");
       modules.add(particles);
       Module storageEsp = new Module("StorageESP", "Visuals", "Подсвечивает сундуки и другие контейнеры.");
       storageEsp.addSetting("Range", 48.0, 12.0, 128.0, 4.0, "Дистанция поиска контейнеров.");

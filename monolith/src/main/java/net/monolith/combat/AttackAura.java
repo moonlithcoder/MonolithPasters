@@ -19,7 +19,6 @@ import net.minecraft.util.TypeFilter;
 import net.monolith.friend.FriendManager;
 import net.monolith.module.Module;
 import net.monolith.module.ModuleManager;
-import net.monolith.visual.WorldParticles;
 
 public final class AttackAura {
    private static LivingEntity target;
@@ -59,7 +58,6 @@ public final class AttackAura {
                if (rotationSyncTicks >= 2 && RotationManager.readyToAttack()) {
                   RotationManager.send(rotation.yaw, rotation.pitch, client);
                   client.interactionManager.attackEntity(client.player, target);
-                  WorldParticles.spawn(target);
                   client.player.swingHand(Hand.MAIN_HAND);
                   delay = 3;
                }
