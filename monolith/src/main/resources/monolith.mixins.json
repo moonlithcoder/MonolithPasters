@@ -7,7 +7,6 @@
     "BackgroundRendererMixin",
     "ChatScreenMixin",
     "ClientWorldMixin",
-    "ClientPlayerInteractionManagerMixin",
     "ClientPlayerEntityMixin",
     "GameRendererMixin",
     "InGameOverlayRendererMixin",

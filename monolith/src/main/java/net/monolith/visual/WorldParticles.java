@@ -4,10 +4,8 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.ThreadLocalRandom;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
-import net.minecraft.block.BlockState;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.util.Identifier;
-import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.client.MinecraftClient;
@@ -47,7 +45,7 @@ public final class WorldParticles {
             if (now - particle.time > 7000L || particle.alpha <= 0.0F || client.player.getPos().distanceTo(particle.pos) > 30.0) {
                PARTICLES.remove(particle);
             } else {
-               particle.update(client);
+               particle.update();
             }
          }
       }
@@ -101,7 +99,6 @@ public final class WorldParticles {
       private Vec3d velocity;
       private final long time;
       private final float spin;
-      private long collisionTime = -1L;
       private float alpha = 1.0F;
 
       private Particle(Vec3d pos) {
@@ -112,28 +109,10 @@ public final class WorldParticles {
          this.spin = random.nextFloat() * 6.28F;
       }
 
-      private void update(MinecraftClient client) {
-         if (this.collisionTime != -1L) {
-            this.alpha = Math.max(0.0F, 1.0F - (float)(System.currentTimeMillis() - this.collisionTime) / 1000.0F);
-         }
-
-         Vec3d next = this.pos.add(this.velocity);
-         BlockState blockState = client.world.getBlockState(BlockPos.ofFloored(next));
-         if (blockState.isAir()) {
-            this.pos = next;
-         } else {
-            if (this.collisionTime == -1L) {
-               this.collisionTime = System.currentTimeMillis();
-            }
-
-            boolean xClear = client.world.getBlockState(BlockPos.ofFloored(this.pos.x + this.velocity.x, this.pos.y, this.pos.z)).isAir();
-            boolean yClear = client.world.getBlockState(BlockPos.ofFloored(this.pos.x, this.pos.y + this.velocity.y, this.pos.z)).isAir();
-            boolean zClear = client.world.getBlockState(BlockPos.ofFloored(this.pos.x, this.pos.y, this.pos.z + this.velocity.z)).isAir();
-            this.velocity = new Vec3d(xClear ? this.velocity.x : 0.0, yClear ? this.velocity.y : 0.0, zClear ? this.velocity.z : 0.0);
-            this.pos = this.pos.add(this.velocity);
-         }
-
+      private void update() {
+         this.pos = this.pos.add(this.velocity);
          this.velocity = this.velocity.add(0.0, -0.0015, 0.0).multiply(0.992, 0.985, 0.992);
+         this.alpha = Math.max(0.0F, 1.0F - (float)(System.currentTimeMillis() - this.time) / 7000.0F);
       }
    }
 }
