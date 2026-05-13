@@ -22,11 +22,11 @@ public class CsGuiScreen extends Screen {
    private int scroll;
    private int settingsScroll;
    private int accent = -16718337;
-   private static final int W = 448;
-   private static final int H = 286;
-   private static final int SIDE_W = 90;
-   private static final int CONTENT_X = 112;
-   private static final int SETTINGS_W = 132;
+   private static final int W = 620;
+   private static final int H = 340;
+   private static final int SIDE_W = 108;
+   private static final int CONTENT_X = 124;
+   private static final int SETTINGS_W = 184;
 
    public CsGuiScreen() {
       super(Text.literal("Monolith"));
@@ -41,24 +41,24 @@ public class CsGuiScreen extends Screen {
       this.openAnim = RenderUtils.lerp(this.openAnim, 1.0F, 0.18F * delta);
       this.settingsAnim = RenderUtils.lerp(this.settingsAnim, this.activeSettingsModule == null ? 0.0F : 1.0F, 0.18F * delta);
       Mre2D r = Mre2D.of(context);
-      int x = (this.width - 448) / 2;
-      int y = (this.height - 286) / 2;
+      int x = (this.width - W) / 2;
+      int y = (this.height - H) / 2;
       r.push();
       r.translate((float)this.width / 2.0F, (float)this.height / 2.0F, 0.0F);
       r.scale(0.94F + this.openAnim * 0.06F, 0.94F + this.openAnim * 0.06F, 1.0F);
       r.translate((float)(-this.width) / 2.0F, (float)(-this.height) / 2.0F, 0.0F);
-      r.blur((float)x, (float)y, 448.0F, 286.0F, 10.0F, 12.0F, -133822968);
-      r.roundedOutline((float)x, (float)y, 448.0F, 286.0F, 10.0F, 1.0F, 587202559);
-      r.gradient((float)x, (float)y, 448.0F, 46.0F, 1510673166, 134217728);
+      r.blur((float)x, (float)y, (float)W, (float)H, 12.0F, 14.0F, -133822968);
+      r.roundedOutline((float)x, (float)y, (float)W, (float)H, 12.0F, 1.0F, 587202559);
+      r.gradient((float)x, (float)y, (float)W, 48.0F, 1510673166, 134217728);
       r.text(this.textRenderer, "MONOLITH", x + 16, y + 13, this.accent, true);
       r.text(this.textRenderer, "visual client", x + 16, y + 27, -9867139, false);
-      int catY = y + 56;
+      int catY = y + 58;
 
       for (String category : this.categories) {
          boolean selected = this.currentCategory.equals(category);
-         boolean hovered = this.inside((double)mouseX, (double)mouseY, x + 12, catY, 90, 23);
+         boolean hovered = this.inside((double)mouseX, (double)mouseY, x + 12, catY, SIDE_W - 24, 23);
          int bg = selected ? this.withAlpha(this.accent, 70) : (hovered ? 419430399 : 0);
-         r.roundedRect((float)(x + 12), (float)catY, 90.0F, 23.0F, 6.0F, bg);
+         r.roundedRect((float)(x + 12), (float)catY, (float)(SIDE_W - 24), 23.0F, 6.0F, bg);
          if (selected) {
             r.roundedRect((float)(x + 12), (float)(catY + 5), 3.0F, 13.0F, 2.0F, this.accent);
          }
@@ -67,12 +67,13 @@ public class CsGuiScreen extends Screen {
          catY += 27;
       }
 
-      int contentX = x + 112;
-      int contentY = y + 56;
-      int contentW = 322;
-      int contentH = 214;
-      r.roundedRect((float)(contentX - 6), (float)(contentY - 8), (float)(contentW + 12), (float)(contentH + 14), 9.0F, -1610481148);
-      r.text(this.textRenderer, this.currentCategory, contentX, y + 30, -1, true);
+      int contentX = x + CONTENT_X;
+      int contentY = y + 58;
+      int settingsX = x + W - SETTINGS_W - 14;
+      int contentW = settingsX - contentX - 12;
+      int contentH = H - 76;
+      r.roundedRect((float)(contentX - 8), (float)(contentY - 10), (float)(contentW + SETTINGS_W + 28), (float)(contentH + 20), 10.0F, -1610481148);
+      r.text(this.textRenderer, this.currentCategory, contentX, y + 31, -1, true);
       if (this.currentCategory.equals("Themes")) {
          this.renderThemes(r, mouseX, mouseY, contentX, contentY);
       } else if (this.currentCategory.equals("Configs")) {
@@ -81,43 +82,41 @@ public class CsGuiScreen extends Screen {
          this.renderModules(r, mouseX, mouseY, contentX, contentY, contentW, contentH, delta);
       }
 
-      this.renderSettings(r, mouseX, mouseY, x + 448 + 6, y, delta);
+      this.renderSettings(r, mouseX, mouseY, settingsX, contentY, SETTINGS_W, contentH, delta);
       r.pop();
    }
 
    private void renderModules(Mre2D r, int mouseX, int mouseY, int x, int y, int width, int height, float delta) {
       List<Module> modules = ModuleManager.getModulesByCategory(this.currentCategory);
-      int colW = (width - 10) / 2;
-      int y1 = y - this.scroll;
-      int y2 = y - this.scroll;
-      r.scissor(x - 4, y - 4, x + width + 4, y + height + 6);
+      int cardH = 48;
+      int gap = 7;
+      int my = y - this.scroll;
+      r.scissor(x - 4, y - 4, x + width + 4, y + height + 4);
 
       for (int i = 0; i < modules.size(); i++) {
          Module module = modules.get(i);
-         boolean left = i % 2 == 0;
-         int mx = left ? x : x + colW + 10;
-         int my = left ? y1 : y2;
+         int mx = x;
          module.toggleAnim = RenderUtils.lerp(module.toggleAnim, module.enabled ? 1.0F : 0.0F, 0.2F * delta);
-         boolean hovered = this.inside((double)mouseX, (double)mouseY, mx, my, colW, 40);
+         boolean selected = this.activeSettingsModule == module;
+         boolean hovered = this.inside((double)mouseX, (double)mouseY, mx, my, width, cardH);
          int color = RenderUtils.lerpColor(-16316405, this.withAlpha(this.accent, 62), module.toggleAnim);
          if (hovered) {
             color = RenderUtils.lerpColor(color, -15658216, 0.55F);
          }
 
-         r.roundedRect((float)mx, (float)my, (float)colW, 40.0F, 8.0F, color);
-         r.roundedOutline((float)mx, (float)my, (float)colW, 40.0F, 8.0F, 0.7F, module.enabled ? this.withAlpha(this.accent, 115) : 318767103);
-         r.roundedRect((float)(mx + 8), (float)(my + 9), 3.0F, 22.0F, 2.0F, module.enabled ? this.accent : -14407630);
-         r.text(this.textRenderer, this.trim(module.name, 15), mx + 17, my + 7, module.enabled ? -1 : -4932664, false);
-         this.marquee(r, module.description, mx + 17, my + 22, colW - 34, -9867139, delta, x - 4, y - 4, x + width + 4, y + height + 6);
+         r.roundedRect((float)mx, (float)my, (float)width, (float)cardH, 8.0F, color);
+         r.roundedOutline((float)mx, (float)my, (float)width, (float)cardH, 8.0F, 0.7F, selected ? this.accent : (module.enabled ? this.withAlpha(this.accent, 115) : 318767103));
+         r.roundedRect((float)(mx + 8), (float)(my + 10), 3.0F, 28.0F, 2.0F, module.enabled ? this.accent : -14407630);
+         r.text(this.textRenderer, this.trim(module.name, 24), mx + 18, my + 8, module.enabled ? -1 : -4932664, false);
+         String state = module.enabled ? "enabled" : "disabled";
+         int stateColor = module.enabled ? this.accent : -10590604;
+         r.text(this.textRenderer, state, mx + width - r.textWidth(this.textRenderer, state) - 20, my + 8, stateColor, false);
+         this.marquee(r, module.description, mx + 18, my + 25, width - 42, -9867139, delta, x - 4, y - 4, x + width + 4, y + height + 4);
          if (this.hasSettings(module)) {
-            r.text(this.textRenderer, ">", mx + colW - 14, my + 16, this.activeSettingsModule == module ? this.accent : -10590604, false);
+            r.text(this.textRenderer, ">", mx + width - 14, my + 25, selected ? this.accent : -10590604, false);
          }
 
-         if (left) {
-            y1 += 47;
-         } else {
-            y2 += 47;
-         }
+         my += cardH + gap;
       }
 
       r.disableScissor();
@@ -157,59 +156,63 @@ public class CsGuiScreen extends Screen {
       }
    }
 
-   private void renderSettings(Mre2D r, int mouseX, int mouseY, int x, int y, float delta) {
-      if (!(this.settingsAnim < 0.03F) && this.activeSettingsModule != null) {
-         int panelW = 132;
-         r.scissor(x, y, x + (int)((float)panelW * this.settingsAnim), y + 286);
-         r.blur((float)x, (float)y, (float)panelW, 286.0F, 10.0F, 12.0F, -200931832);
-         r.roundedOutline((float)x, (float)y, (float)panelW, 286.0F, 10.0F, 1.0F, 520093695);
-         r.text(this.textRenderer, this.trim(this.activeSettingsModule.name, 15), x + 10, y + 11, this.accent, true);
-         r.text(this.textRenderer, "settings", x + 10, y + 25, -10525069, false);
-         int sy = y + 43 - this.settingsScroll;
+   private void renderSettings(Mre2D r, int mouseX, int mouseY, int x, int y, int width, int height, float delta) {
+      r.roundedRect((float)x, (float)y, (float)width, (float)height, 10.0F, -16250612);
+      r.roundedOutline((float)x, (float)y, (float)width, (float)height, 10.0F, 0.8F, this.activeSettingsModule == null ? 285212671 : 520093695);
+      if (this.activeSettingsModule == null) {
+         r.text(this.textRenderer, "Settings", x + 12, y + 12, this.accent, true);
+         r.text(this.textRenderer, "Right click module", x + 12, y + 31, -9867139, false);
+         r.text(this.textRenderer, "to edit options", x + 12, y + 43, -9867139, false);
+      } else if (!(this.settingsAnim < 0.03F)) {
+         r.scissor(x, y, x + (int)((float)width * this.settingsAnim), y + height);
+         r.text(this.textRenderer, this.trim(this.activeSettingsModule.name, 21), x + 12, y + 11, this.accent, true);
+         this.marquee(r, this.activeSettingsModule.description, x + 12, y + 27, width - 24, -9867139, delta, x, y, x + (int)((float)width * this.settingsAnim), y + height);
+         int sy = y + 50 - this.settingsScroll;
 
          if (!this.activeSettingsModule.modes.isEmpty()) {
-            r.roundedRect((float)(x + 7), (float)(sy - 6), (float)(panelW - 14), 30.0F, 7.0F, -16250612);
-            r.roundedOutline((float)(x + 7), (float)(sy - 6), (float)(panelW - 14), 30.0F, 7.0F, 0.6F, 285212671);
-            r.text(this.textRenderer, "Mode", x + 12, sy, -3353116, false);
-            r.text(this.textRenderer, this.trim(this.activeSettingsModule.currentMode, 14), x + 12, sy + 13, this.accent, false);
-            sy += 36;
+            r.roundedRect((float)(x + 8), (float)(sy - 5), (float)(width - 16), 36.0F, 7.0F, -15263453);
+            r.roundedOutline((float)(x + 8), (float)(sy - 5), (float)(width - 16), 36.0F, 7.0F, 0.6F, 285212671);
+            r.text(this.textRenderer, "Mode", x + 14, sy, -3353116, false);
+            r.text(this.textRenderer, this.trim(this.activeSettingsModule.currentMode, 20), x + 14, sy + 15, this.accent, false);
+            sy += 42;
          }
 
          for (Module.Setting setting : this.activeSettingsModule.settings.values()) {
-            r.roundedRect((float)(x + 7), (float)(sy - 6), (float)(panelW - 14), setting.color ? 34.0F : 38.0F, 7.0F, -16250612);
-            r.roundedOutline((float)(x + 7), (float)(sy - 6), (float)(panelW - 14), setting.color ? 34.0F : 38.0F, 7.0F, 0.6F, 285212671);
-            r.text(this.textRenderer, this.trim(setting.name, 13), x + 12, sy, -3353116, false);
-            this.marquee(r, setting.description, x + 12, sy + 12, panelW - 25, -10525069, delta, x, y, x + (int)((float)panelW * this.settingsAnim), y + 286);
+            int rowH = setting.color ? 44 : 50;
+            r.roundedRect((float)(x + 8), (float)(sy - 5), (float)(width - 16), (float)rowH, 7.0F, -15263453);
+            r.roundedOutline((float)(x + 8), (float)(sy - 5), (float)(width - 16), (float)rowH, 7.0F, 0.6F, 285212671);
+            r.text(this.textRenderer, this.trim(setting.name, 18), x + 14, sy, -3353116, false);
+            r.text(this.textRenderer, setting.displayValue(), x + width - 14 - r.textWidth(this.textRenderer, setting.displayValue()), sy, this.accent, false);
+            this.marquee(r, setting.description, x + 14, sy + 13, width - 28, -10525069, delta, x, y, x + (int)((float)width * this.settingsAnim), y + height);
             if (setting.color) {
-               this.drawPalette(r, x + 12, sy + 18, panelW - 34, 7);
+               this.drawPalette(r, x + 14, sy + 29, width - 38, 7);
                int color = 0xFF000000 | (int)Math.rint(setting.value) & 16777215;
-               r.roundedRect((float)(x + panelW - 23), (float)sy, 10.0F, 10.0F, 3.0F, color);
-               sy += 40;
+               r.roundedRect((float)(x + width - 22), (float)(sy + 28), 10.0F, 10.0F, 3.0F, color);
             } else {
-               r.text(this.textRenderer, setting.displayValue(), x + panelW - 32, sy, this.accent, false);
                double progress = (setting.value - setting.min) / (setting.max - setting.min);
-               r.roundedRect((float)(x + 12), (float)(sy + 22), (float)(panelW - 26), 5.0F, 3.0F, -15263453);
-               r.roundedRect((float)(x + 12), (float)(sy + 22), (float)((int)((double)(panelW - 26) * progress)), 5.0F, 3.0F, this.accent);
-               sy += 44;
+               r.roundedRect((float)(x + 14), (float)(sy + 33), (float)(width - 28), 5.0F, 3.0F, -13421773);
+               r.roundedRect((float)(x + 14), (float)(sy + 33), (float)((int)((double)(width - 28) * progress)), 5.0F, 3.0F, this.accent);
             }
+            sy += rowH + 8;
          }
 
          for (Module.OptionSetting option : this.activeSettingsModule.optionSettings) {
-            r.roundedRect((float)(x + 7), (float)(sy - 6), (float)(panelW - 14), (float)(30 + option.options.size() * 21), 7.0F, -16250612);
-            r.roundedOutline((float)(x + 7), (float)(sy - 6), (float)(panelW - 14), (float)(30 + option.options.size() * 21), 7.0F, 0.6F, 285212671);
-            r.text(this.textRenderer, this.trim(option.name, 11), x + 12, sy, -3353116, false);
-            this.marquee(r, option.description, x + 12, sy + 12, panelW - 25, -10525069, delta, x, y, x + (int)((float)panelW * this.settingsAnim), y + 286);
-            sy += 27;
+            int rowH = 36 + option.options.size() * 20;
+            r.roundedRect((float)(x + 8), (float)(sy - 5), (float)(width - 16), (float)rowH, 7.0F, -15263453);
+            r.roundedOutline((float)(x + 8), (float)(sy - 5), (float)(width - 16), (float)rowH, 7.0F, 0.6F, 285212671);
+            r.text(this.textRenderer, this.trim(option.name, 18), x + 14, sy, -3353116, false);
+            this.marquee(r, option.description, x + 14, sy + 13, width - 28, -10525069, delta, x, y, x + (int)((float)width * this.settingsAnim), y + height);
+            sy += 30;
 
             for (String value : option.options) {
                boolean selected = option.isSelected(value);
-               boolean hovered = this.inside((double)mouseX, (double)mouseY, x + 10, sy, panelW - 20, 18);
+               boolean hovered = this.inside((double)mouseX, (double)mouseY, x + 12, sy, width - 24, 17);
                r.roundedRect(
-                  (float)(x + 10), (float)sy, (float)(panelW - 20), 18.0F, 5.0F, selected ? this.withAlpha(this.accent, 78) : (hovered ? 419430399 : 0)
+                  (float)(x + 12), (float)sy, (float)(width - 24), 17.0F, 5.0F, selected ? this.withAlpha(this.accent, 78) : (hovered ? 419430399 : 0)
                );
-               r.roundedRect((float)(x + 14), (float)(sy + 5), 3.0F, 8.0F, 2.0F, selected ? this.accent : -14012872);
-               r.text(this.textRenderer, this.trim(value, 14), x + 22, sy + 6, selected ? -1 : -8550504, false);
-               sy += 21;
+               r.roundedRect((float)(x + 16), (float)(sy + 5), 3.0F, 7.0F, 2.0F, selected ? this.accent : -14012872);
+               r.text(this.textRenderer, this.trim(value, 20), x + 24, sy + 5, selected ? -1 : -8550504, false);
+               sy += 20;
             }
 
             sy += 8;
@@ -217,17 +220,17 @@ public class CsGuiScreen extends Screen {
 
          String bind = this.activeSettingsModule.binding ? "Press key..." : "Bind: " + this.bindName(this.activeSettingsModule.keyCode);
          r.roundedRect(
-            (float)(x + 7), (float)sy, (float)(panelW - 14), 22.0F, 7.0F, this.activeSettingsModule.binding ? this.withAlpha(this.accent, 72) : -16250612
+            (float)(x + 8), (float)sy, (float)(width - 16), 24.0F, 7.0F, this.activeSettingsModule.binding ? this.withAlpha(this.accent, 72) : -15263453
          );
-         r.roundedOutline((float)(x + 7), (float)sy, (float)(panelW - 14), 22.0F, 7.0F, 0.6F, 285212671);
-         r.text(this.textRenderer, this.trim(bind, 16), x + 14, sy + 7, this.activeSettingsModule.binding ? -1 : -4932664, false);
-         sy += 26;
+         r.roundedOutline((float)(x + 8), (float)sy, (float)(width - 16), 24.0F, 7.0F, 0.6F, 285212671);
+         r.text(this.textRenderer, this.trim(bind, 22), x + 14, sy + 8, this.activeSettingsModule.binding ? -1 : -4932664, false);
+         sy += 30;
          if (this.activeSettingsModule.name.equals("HUD")) {
             String hudBind = this.activeSettingsModule.hudBinding ? "Press HUD key..." : "HUD: " + this.bindName(this.activeSettingsModule.hudKeyCode);
             r.roundedRect(
-               (float)(x + 7), (float)sy, (float)(panelW - 14), 22.0F, 7.0F, this.activeSettingsModule.hudBinding ? this.withAlpha(this.accent, 72) : -16250612
+               (float)(x + 8), (float)sy, (float)(width - 16), 24.0F, 7.0F, this.activeSettingsModule.hudBinding ? this.withAlpha(this.accent, 72) : -15263453
             );
-            r.text(this.textRenderer, this.trim(hudBind, 16), x + 14, sy + 7, this.activeSettingsModule.hudBinding ? -1 : -4932664, false);
+            r.text(this.textRenderer, this.trim(hudBind, 22), x + 14, sy + 8, this.activeSettingsModule.hudBinding ? -1 : -4932664, false);
          }
 
          r.disableScissor();
@@ -235,15 +238,16 @@ public class CsGuiScreen extends Screen {
    }
 
    public boolean mouseClicked(double mouseX, double mouseY, int button) {
-      int x = (this.width - 448) / 2;
-      int y = (this.height - 286) / 2;
-      int catY = y + 56;
+      int x = (this.width - W) / 2;
+      int y = (this.height - H) / 2;
+      int catY = y + 58;
 
       for (String category : this.categories) {
-         if (this.inside(mouseX, mouseY, x + 12, catY, 90, 23) && button == 0) {
+         if (this.inside(mouseX, mouseY, x + 12, catY, SIDE_W - 24, 23) && button == 0) {
             this.currentCategory = category;
             this.activeSettingsModule = null;
             this.scroll = 0;
+            this.settingsScroll = 0;
             return true;
          }
 
@@ -251,93 +255,94 @@ public class CsGuiScreen extends Screen {
       }
 
       if (this.currentCategory.equals("Themes")) {
-         return this.clickThemes(mouseX, mouseY, button, x + 112, y + 56);
+         return this.clickThemes(mouseX, mouseY, button, x + CONTENT_X, y + 58);
       } else if (this.currentCategory.equals("Configs")) {
-         return this.clickConfigs(mouseX, mouseY, button, x + 112, y + 56);
+         return this.clickConfigs(mouseX, mouseY, button, x + CONTENT_X, y + 58);
       } else {
-         return this.clickSettings(mouseX, mouseY, button, x + 448 + 6, y) ? true : this.clickModules(mouseX, mouseY, button, x + 112, y + 56, 322);
+         int contentX = x + CONTENT_X;
+         int contentY = y + 58;
+         int settingsX = x + W - SETTINGS_W - 14;
+         int contentW = settingsX - contentX - 12;
+         int contentH = H - 76;
+         return this.clickSettings(mouseX, mouseY, button, settingsX, contentY, SETTINGS_W, contentH)
+            ? true
+            : this.clickModules(mouseX, mouseY, button, contentX, contentY, contentW);
       }
    }
 
    private boolean clickModules(double mouseX, double mouseY, int button, int x, int y, int width) {
       List<Module> modules = ModuleManager.getModulesByCategory(this.currentCategory);
-      int colW = (width - 10) / 2;
-      int y1 = y - this.scroll;
-      int y2 = y - this.scroll;
+      int cardH = 48;
+      int my = y - this.scroll;
 
       for (int i = 0; i < modules.size(); i++) {
          Module module = modules.get(i);
-         boolean left = i % 2 == 0;
-         int mx = left ? x : x + colW + 10;
-         int my = left ? y1 : y2;
-         if (this.inside(mouseX, mouseY, mx, my, colW, 44)) {
+         if (this.inside(mouseX, mouseY, x, my, width, cardH)) {
             if (button == 0) {
                module.toggle();
             } else if (button == 1 && this.hasSettings(module)) {
                this.activeSettingsModule = this.activeSettingsModule == module ? null : module;
+               this.settingsScroll = 0;
             } else if (button == 2) {
                this.activeSettingsModule = module;
                module.binding = true;
+               this.settingsScroll = 0;
             }
 
             return true;
          }
 
-         if (left) {
-            y1 += 47;
-         } else {
-            y2 += 47;
-         }
+         my += cardH + 7;
       }
 
       return false;
    }
 
-   private boolean clickSettings(double mouseX, double mouseY, int button, int x, int y) {
-      if (this.activeSettingsModule != null && !(this.settingsAnim < 0.85F) && this.inside(mouseX, mouseY, x, y, 132, 286)) {
-         int sy = y + 43 - this.settingsScroll;
+   private boolean clickSettings(double mouseX, double mouseY, int button, int x, int y, int width, int height) {
+      if (this.activeSettingsModule != null && !(this.settingsAnim < 0.85F) && this.inside(mouseX, mouseY, x, y, width, height)) {
+         int sy = y + 50 - this.settingsScroll;
 
          if (!this.activeSettingsModule.modes.isEmpty()) {
-            if (this.inside(mouseX, mouseY, x + 7, sy - 6, 118, 30) && button == 0) {
+            if (this.inside(mouseX, mouseY, x + 8, sy - 5, width - 16, 36) && button == 0) {
                this.activeSettingsModule.cycleMode();
                return true;
             }
 
-            sy += 36;
+            sy += 42;
          }
 
          for (Module.Setting setting : this.activeSettingsModule.settings.values()) {
-            int rowH = setting.color ? 34 : 38;
-            if (this.inside(mouseX, mouseY, x + 7, sy - 6, 118, rowH) && button == 0) {
+            int rowH = setting.color ? 44 : 50;
+            if (this.inside(mouseX, mouseY, x + 8, sy - 5, width - 16, rowH) && button == 0) {
                this.draggingSetting = setting;
-               this.updateDraggingSetting(mouseX, x, setting);
+               this.updateDraggingSetting(mouseX, x, width, setting);
                return true;
             }
 
-            sy += setting.color ? 40 : 44;
+            sy += rowH + 8;
          }
 
          for (Module.OptionSetting option : this.activeSettingsModule.optionSettings) {
-            sy += 27;
+            sy += 30;
 
             for (String value : option.options) {
-               if (this.inside(mouseX, mouseY, x + 10, sy, 112, 18) && button == 0) {
+               if (this.inside(mouseX, mouseY, x + 12, sy, width - 24, 17) && button == 0) {
                   option.click(value);
                   return true;
                }
 
-               sy += 21;
+               sy += 20;
             }
 
             sy += 8;
          }
 
-         if (this.inside(mouseX, mouseY, x + 7, sy, 118, 22) && button == 0) {
+         if (this.inside(mouseX, mouseY, x + 8, sy, width - 16, 24) && button == 0) {
             this.activeSettingsModule.binding = true;
             return true;
          } else {
-            sy += 26;
-            if (this.activeSettingsModule.name.equals("HUD") && this.inside(mouseX, mouseY, x + 7, sy, 118, 22) && button == 0) {
+            sy += 30;
+            if (this.activeSettingsModule.name.equals("HUD") && this.inside(mouseX, mouseY, x + 8, sy, width - 16, 24) && button == 0) {
                this.activeSettingsModule.hudBinding = true;
                return true;
             } else {
@@ -389,8 +394,8 @@ public class CsGuiScreen extends Screen {
 
    public boolean mouseDragged(double mouseX, double mouseY, int button, double deltaX, double deltaY) {
       if (this.draggingSetting != null && this.activeSettingsModule != null) {
-         int x = (this.width - 448) / 2 + 448 + 6;
-         this.updateDraggingSetting(mouseX, x, this.draggingSetting);
+         int x = (this.width - W) / 2 + W - SETTINGS_W - 14;
+         this.updateDraggingSetting(mouseX, x, SETTINGS_W, this.draggingSetting);
          return true;
       } else {
          return super.mouseDragged(mouseX, mouseY, button, deltaX, deltaY);
@@ -403,12 +408,17 @@ public class CsGuiScreen extends Screen {
    }
 
    public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
-      int x = (this.width - 448) / 2;
-      int y = (this.height - 286) / 2;
-      if (this.activeSettingsModule != null && this.inside(mouseX, mouseY, x + 448 + 6, y, 132, 286)) {
+      int x = (this.width - W) / 2;
+      int y = (this.height - H) / 2;
+      int contentX = x + CONTENT_X;
+      int contentY = y + 58;
+      int settingsX = x + W - SETTINGS_W - 14;
+      int contentW = settingsX - contentX - 12;
+      int contentH = H - 76;
+      if (this.activeSettingsModule != null && this.inside(mouseX, mouseY, settingsX, contentY, SETTINGS_W, contentH)) {
          this.settingsScroll = Math.max(0, this.settingsScroll - (int)(verticalAmount * 20.0));
          return true;
-      } else if (this.inside(mouseX, mouseY, x + 112, y + 56, 322, 214)) {
+      } else if (this.inside(mouseX, mouseY, contentX, contentY, contentW, contentH)) {
          this.scroll = Math.max(0, this.scroll - (int)(verticalAmount * 24.0));
          return true;
       } else {
@@ -434,8 +444,8 @@ public class CsGuiScreen extends Screen {
       return !module.modes.isEmpty() || !module.settings.isEmpty() || !module.optionSettings.isEmpty();
    }
 
-   private void updateDraggingSetting(double mouseX, int x, Module.Setting setting) {
-      double progress = Math.max(0.0, Math.min(1.0, (mouseX - (double)(x + 12)) / 106.0));
+   private void updateDraggingSetting(double mouseX, int x, int width, Module.Setting setting) {
+      double progress = Math.max(0.0, Math.min(1.0, (mouseX - (double)(x + 14)) / (double)(width - 28)));
       if (setting.color) {
          setting.set((double)this.paletteColor(progress));
       } else {
