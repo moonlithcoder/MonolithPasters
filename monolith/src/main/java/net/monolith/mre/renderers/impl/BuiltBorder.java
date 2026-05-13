@@ -1,0 +1,87 @@
+package net.monolith.mre.renderers.impl;
+
+import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.gl.ShaderProgramKeys;
+import net.minecraft.client.render.BufferRenderer;
+import net.minecraft.client.render.BufferBuilder;
+import net.minecraft.client.render.Tessellator;
+import net.minecraft.client.render.VertexFormats;
+import net.minecraft.client.render.VertexFormat.DrawMode;
+import net.monolith.mre.builders.states.QuadColorState;
+import net.monolith.mre.builders.states.QuadRadiusState;
+import net.monolith.mre.builders.states.SizeState;
+import net.monolith.mre.renderers.IRenderer;
+import org.joml.Matrix4f;
+
+public record BuiltBorder(SizeState size, QuadRadiusState radius, QuadColorState color, float thickness, float internalSmoothness, float externalSmoothness)
+   implements IRenderer {
+   @Override
+   public void render(Matrix4f matrix, float x, float y, float z) {
+      float width = this.size.width();
+      float height = this.size.height();
+      if (!(width <= 0.0F) && !(height <= 0.0F)) {
+         RenderSystem.enableBlend();
+         RenderSystem.defaultBlendFunc();
+         RenderSystem.disableCull();
+         RenderSystem.setShader(ShaderProgramKeys.POSITION_COLOR);
+         RenderSystem.lineWidth(Math.max(1.0F, this.thickness));
+         BufferBuilder b = Tessellator.getInstance().begin(DrawMode.DEBUG_LINE_STRIP, VertexFormats.POSITION_COLOR);
+         float r = Math.min(Math.min(Math.max(0.0F, this.maxRadius()), width / 2.0F), height / 2.0F);
+         int c = this.averageColor();
+         if (r <= 0.0F) {
+            b.vertex(matrix, x, y, z).color(c);
+            b.vertex(matrix, x + width, y, z).color(c);
+            b.vertex(matrix, x + width, y + height, z).color(c);
+            b.vertex(matrix, x, y + height, z).color(c);
+            b.vertex(matrix, x, y, z).color(c);
+         } else {
+            this.corner(b, matrix, x + width - r, y + r, z, r, -90.0F, 0.0F, c);
+            this.corner(b, matrix, x + width - r, y + height - r, z, r, 0.0F, 90.0F, c);
+            this.corner(b, matrix, x + r, y + height - r, z, r, 90.0F, 180.0F, c);
+            this.corner(b, matrix, x + r, y + r, z, r, 180.0F, 270.0F, c);
+            b.vertex(matrix, x + width - r, y, z).color(c);
+         }
+
+         BufferRenderer.drawWithGlobalProgram(b.end());
+         RenderSystem.lineWidth(1.0F);
+         RenderSystem.enableCull();
+      }
+   }
+
+   private void corner(BufferBuilder builder, Matrix4f matrix, float cx, float cy, float z, float r, float start, float end, int color) {
+      int segments = Math.max(5, (int)Math.ceil((double)(r * 1.25F)));
+
+      for (int i = 0; i <= segments; i++) {
+         float angle = (float)Math.toRadians((double)(start + (end - start) * (float)i / (float)segments));
+         builder.vertex(matrix, cx + (float)Math.cos((double)angle) * r, cy + (float)Math.sin((double)angle) * r, z).color(color);
+      }
+   }
+
+   private float maxRadius() {
+      return Math.max(Math.max(this.radius.radius1(), this.radius.radius2()), Math.max(this.radius.radius3(), this.radius.radius4()));
+   }
+
+   private int averageColor() {
+      int a = (alpha(this.color.color1()) + alpha(this.color.color2()) + alpha(this.color.color3()) + alpha(this.color.color4())) / 4;
+      int r = (red(this.color.color1()) + red(this.color.color2()) + red(this.color.color3()) + red(this.color.color4())) / 4;
+      int g = (green(this.color.color1()) + green(this.color.color2()) + green(this.color.color3()) + green(this.color.color4())) / 4;
+      int b = (blue(this.color.color1()) + blue(this.color.color2()) + blue(this.color.color3()) + blue(this.color.color4())) / 4;
+      return a << 24 | r << 16 | g << 8 | b;
+   }
+
+   private static int alpha(int c) {
+      return c >>> 24 & 0xFF;
+   }
+
+   private static int red(int c) {
+      return c >>> 16 & 0xFF;
+   }
+
+   private static int green(int c) {
+      return c >>> 8 & 0xFF;
+   }
+
+   private static int blue(int c) {
+      return c & 0xFF;
+   }
+}

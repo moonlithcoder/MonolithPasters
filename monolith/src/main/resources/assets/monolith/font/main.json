@@ -1,0 +1,25 @@
+{
+  "providers": [
+    {
+      "type": "ttf",
+      "file": "monolith:monolith.ttf",
+      "shift": [0, 0.75],
+      "size": 10.5,
+      "oversample": 4.0
+    },
+    {
+      "type": "ttf",
+      "file": "monolith:monolith_cjk.ttf",
+      "shift": [0, 1],
+      "size": 10.0,
+      "oversample": 3.0
+    },
+    {
+      "type": "ttf",
+      "file": "monolith:monolith_unicode.ttf",
+      "shift": [0, 1],
+      "size": 10.0,
+      "oversample": 2.0
+    }
+  ]
+}

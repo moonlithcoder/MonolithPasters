@@ -1,0 +1,22 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "net.monolith.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+    "BackgroundRendererMixin",
+    "ChatScreenMixin",
+    "ClientWorldMixin",
+    "ClientPlayerEntityMixin",
+    "GameRendererMixin",
+    "InGameOverlayRendererMixin",
+    "LightmapTextureManagerMixin",
+    "MinecraftClientMixin",
+    "MinecraftClientAccessor"
+  ],
+  "client": [],
+  "injectors": {
+    "defaultRequire": 1
+  },
+  "refmap": "Monolith-refmap.json"
+}

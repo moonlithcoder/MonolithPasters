@@ -1,0 +1,70 @@
+{
+  "mappings": {
+    "net/monolith/mixin/BackgroundRendererMixin": {
+      "getFogColor": "Lnet/minecraft/class_758;method_62185(Lnet/minecraft/class_4184;FLnet/minecraft/class_638;IF)Lorg/joml/Vector4f;"
+    },
+    "net/monolith/mixin/ChatScreenMixin": {
+      "onChatFieldUpdate": "Lnet/minecraft/class_408;method_23945(Ljava/lang/String;)V"
+    },
+    "net/monolith/mixin/ClientPlayerEntityMixin": {
+      "Lnet/minecraft/client/network/ClientPlayerEntity;getPitch()F": "Lnet/minecraft/class_746;method_36455()F",
+      "Lnet/minecraft/client/network/ClientPlayerEntity;getYaw()F": "Lnet/minecraft/class_746;method_36454()F",
+      "sendMovementPackets": "Lnet/minecraft/class_746;method_3136()V"
+    },
+    "net/monolith/mixin/ClientWorldMixin": {
+      "getCloudsColor": "Lnet/minecraft/class_638;method_23785(F)I",
+      "getSkyColor": "Lnet/minecraft/class_638;method_23777(Lnet/minecraft/class_243;F)I"
+    },
+    "net/monolith/mixin/GameRendererMixin": {
+      "bobView": "Lnet/minecraft/class_757;method_3186(Lnet/minecraft/class_4587;F)V",
+      "tiltViewWhenHurt": "Lnet/minecraft/class_757;method_3198(Lnet/minecraft/class_4587;F)V"
+    },
+    "net/monolith/mixin/InGameOverlayRendererMixin": {
+      "renderFireOverlay": "Lnet/minecraft/class_4603;method_23070(Lnet/minecraft/class_4587;Lnet/minecraft/class_4597;)V"
+    },
+    "net/monolith/mixin/LightmapTextureManagerMixin": {
+      "getBrightness(FI)F": "Lnet/minecraft/class_765;method_62226(FI)F"
+    },
+    "net/monolith/mixin/MinecraftClientAccessor": {
+      "session": "field_1726:Lnet/minecraft/class_320;"
+    },
+    "net/monolith/mixin/MinecraftClientMixin": {
+      "setScreen": "Lnet/minecraft/class_310;method_1507(Lnet/minecraft/class_437;)V"
+    }
+  },
+  "data": {
+    "named:intermediary": {
+      "net/monolith/mixin/BackgroundRendererMixin": {
+        "getFogColor": "Lnet/minecraft/class_758;method_62185(Lnet/minecraft/class_4184;FLnet/minecraft/class_638;IF)Lorg/joml/Vector4f;"
+      },
+      "net/monolith/mixin/ChatScreenMixin": {
+        "onChatFieldUpdate": "Lnet/minecraft/class_408;method_23945(Ljava/lang/String;)V"
+      },
+      "net/monolith/mixin/ClientPlayerEntityMixin": {
+        "Lnet/minecraft/client/network/ClientPlayerEntity;getPitch()F": "Lnet/minecraft/class_746;method_36455()F",
+        "Lnet/minecraft/client/network/ClientPlayerEntity;getYaw()F": "Lnet/minecraft/class_746;method_36454()F",
+        "sendMovementPackets": "Lnet/minecraft/class_746;method_3136()V"
+      },
+      "net/monolith/mixin/ClientWorldMixin": {
+        "getCloudsColor": "Lnet/minecraft/class_638;method_23785(F)I",
+        "getSkyColor": "Lnet/minecraft/class_638;method_23777(Lnet/minecraft/class_243;F)I"
+      },
+      "net/monolith/mixin/GameRendererMixin": {
+        "bobView": "Lnet/minecraft/class_757;method_3186(Lnet/minecraft/class_4587;F)V",
+        "tiltViewWhenHurt": "Lnet/minecraft/class_757;method_3198(Lnet/minecraft/class_4587;F)V"
+      },
+      "net/monolith/mixin/InGameOverlayRendererMixin": {
+        "renderFireOverlay": "Lnet/minecraft/class_4603;method_23070(Lnet/minecraft/class_4587;Lnet/minecraft/class_4597;)V"
+      },
+      "net/monolith/mixin/LightmapTextureManagerMixin": {
+        "getBrightness(FI)F": "Lnet/minecraft/class_765;method_62226(FI)F"
+      },
+      "net/monolith/mixin/MinecraftClientAccessor": {
+        "session": "field_1726:Lnet/minecraft/class_320;"
+      },
+      "net/monolith/mixin/MinecraftClientMixin": {
+        "setScreen": "Lnet/minecraft/class_310;method_1507(Lnet/minecraft/class_437;)V"
+      }
+    }
+  }
+}

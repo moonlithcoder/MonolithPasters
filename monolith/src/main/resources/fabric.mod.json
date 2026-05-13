@@ -1,0 +1,24 @@
+{
+  "schemaVersion": 1,
+  "id": "monolith",
+  "version": "1.0.0",
+  "name": "Monolith",
+  "description": "Custom 2D Render Client",
+  "authors": ["User"],
+  "contact": {},
+  "license": "MIT",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "net.monolith.Monolith"
+    ]
+  },
+  "mixins": [
+    "monolith.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=0.16.9",
+    "minecraft": "~1.21.4",
+    "java": ">=21"
+  }
+}
