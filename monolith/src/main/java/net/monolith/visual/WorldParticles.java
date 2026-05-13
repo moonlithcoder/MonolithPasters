@@ -26,7 +26,7 @@ public final class WorldParticles {
       long now = System.currentTimeMillis();
       MinecraftClient client = MinecraftClient.getInstance();
       Module module = ModuleManager.getModule("World particles");
-      if (module == null || !module.enabled || client.player == null || client.world == null) {
+      if (module == null || !module.enabled || client.player == null || client.world == null || client.isPaused()) {
          PARTICLES.clear();
       } else {
          spawnWorldParticles(client, module, now);
@@ -88,7 +88,9 @@ public final class WorldParticles {
       double range = module.getSettingValue("Радиус спавна", 25.0);
       double height = module.getSettingValue("Высота спавна", 10.0);
       Vec3d playerPos = client.player.getPos();
-      Vec3d pos = playerPos.add(random.nextDouble(-range, range), height + random.nextDouble(0.0, 3.0), random.nextDouble(-range, range));
+      double distance = Math.sqrt(random.nextDouble()) * range;
+      double angle = random.nextDouble(Math.PI * 2.0);
+      Vec3d pos = playerPos.add(Math.cos(angle) * distance, height + random.nextDouble(0.0, 3.0), Math.sin(angle) * distance);
       PARTICLES.add(new WorldParticles.Particle(pos, (long)Math.round(module.getSettingValue("Время жизни", 1800.0))));
    }
 
@@ -117,7 +119,7 @@ public final class WorldParticles {
       private Particle(Vec3d pos, long lifeTime) {
          ThreadLocalRandom random = ThreadLocalRandom.current();
          this.pos = pos;
-         this.velocity = new Vec3d(random.nextDouble(-0.01, 0.01), random.nextDouble(-0.035, -0.015), random.nextDouble(-0.01, 0.01));
+         this.velocity = new Vec3d(random.nextDouble(-0.006, 0.006), random.nextDouble(-0.028, -0.012), random.nextDouble(-0.006, 0.006));
          this.time = System.currentTimeMillis();
          this.lifeTime = Math.max(500L, lifeTime);
          this.spin = random.nextFloat() * 6.28F;
@@ -125,8 +127,8 @@ public final class WorldParticles {
 
       private void update(Module module) {
          this.pos = this.pos.add(this.velocity);
-         double gravity = module.getSettingValue("Гравитация", 1.0) * 0.0008;
-         this.velocity = this.velocity.add(0.0, -gravity, 0.0).multiply(0.996, 0.995, 0.996);
+         double gravity = module.getSettingValue("Гравитация", 1.0) * 0.00045;
+         this.velocity = this.velocity.add(0.0, -gravity, 0.0).multiply(0.992, 0.996, 0.992);
          this.alpha = this.fade();
       }
 

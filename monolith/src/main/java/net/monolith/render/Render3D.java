@@ -556,6 +556,7 @@ public final class Render3D {
          BufferRenderer.drawWithGlobalProgram(builder.end());
          RenderSystem.depthMask(true);
          RenderSystem.enableDepthTest();
+         RenderSystem.defaultBlendFunc();
          this.teardown();
       }
    }
@@ -570,6 +571,7 @@ public final class Render3D {
          BufferBuilder builder = Tessellator.getInstance().begin(DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
          drawer.draw(builder);
          BufferRenderer.drawWithGlobalProgram(builder.end());
+         RenderSystem.depthMask(true);
          this.teardown();
       }
    }
@@ -585,6 +587,8 @@ public final class Render3D {
          BufferBuilder builder = Tessellator.getInstance().begin(DrawMode.QUADS, VertexFormats.POSITION_TEXTURE_COLOR);
          drawer.draw(builder);
          BufferRenderer.drawWithGlobalProgram(builder.end());
+         RenderSystem.depthMask(true);
+         RenderSystem.defaultBlendFunc();
          this.teardown();
       }
    }
@@ -599,7 +603,10 @@ public final class Render3D {
 
    private void teardown() {
       RenderSystem.depthMask(true);
+      RenderSystem.enableDepthTest();
+      RenderSystem.defaultBlendFunc();
       RenderSystem.enableCull();
+      RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
    }
 
    private void addLineVertex(BufferBuilder builder, double x, double y, double z, int color) {

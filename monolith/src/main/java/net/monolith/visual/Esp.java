@@ -24,13 +24,15 @@ public final class Esp {
          int alpha = (int)(module.getSettingValue("Opacity", 45.0) * 2.55);
          int color = Math.max(25, Math.min(255, alpha)) << 24;
          Render3D renderer = Render3D.of(context);
-         Box area = client.player.getBoundingBox().expand(64.0);
+         Box area = client.player.getBoundingBox().expand(96.0);
 
          for (LivingEntity entity : client.world.getEntitiesByType(TypeFilter.instanceOf(LivingEntity.class), area, entityx -> shouldRender(entityx, module))) {
-            Box box = entity.getBoundingBox().expand(0.025);
-            int outline = entity instanceof PlayerEntity ? -16718337 : (entity instanceof MobEntity ? -41892 : -11141238);
-            renderer.filledBox(box, color);
-            renderer.box(box, outline);
+            if (client.gameRenderer.getCamera().getPos().squaredDistanceTo(entity.getPos()) <= 9216.0) {
+               Box box = entity.getBoundingBox().expand(0.025);
+               int outline = entity instanceof PlayerEntity ? -16718337 : (entity instanceof MobEntity ? -41892 : -11141238);
+               renderer.filledBox(box, color);
+               renderer.box(box, outline);
+            }
          }
       }
    }

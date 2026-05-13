@@ -67,17 +67,25 @@ public class Monolith implements ClientModInitializer {
          }
       });
       HudRenderCallback.EVENT.register((HudRenderCallback)(context, tickDelta) -> {
-         HudManager.render(context, tickDelta.getTickDelta(true));
-         Arrows.render(context, tickDelta.getTickDelta(true));
+         try {
+            HudManager.render(context, tickDelta.getTickDelta(true));
+            Arrows.render(context, tickDelta.getTickDelta(true));
+         } catch (RuntimeException exception) {
+            LOGGER.warn("HUD render skipped", exception);
+         }
       });
       WorldRenderEvents.LAST.register((Last)context -> {
-         Esp.render(context);
-         TargetEsp.render(context);
-         Trails.render(context);
-         WorldParticles.render(context);
-         Prediction.render(context);
-         StorageEsp.render(context);
-         Nametags.render(context);
+         try {
+            Esp.render(context);
+            TargetEsp.render(context);
+            Trails.render(context);
+            WorldParticles.render(context);
+            Prediction.render(context);
+            StorageEsp.render(context);
+            Nametags.render(context);
+         } catch (RuntimeException exception) {
+            LOGGER.warn("World render skipped", exception);
+         }
       });
       ClientSendMessageEvents.ALLOW_CHAT.register((AllowChat)message -> !ConfigManager.handleChat(message));
       ScreenEvents.AFTER_INIT

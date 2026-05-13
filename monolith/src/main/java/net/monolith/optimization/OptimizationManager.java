@@ -62,7 +62,7 @@ public final class OptimizationManager {
          options.getSimulationDistance().setValue(Math.min(simulationDistance, 5));
          options.getEntityDistanceScaling().setValue(Math.min(entityDistance, 0.75));
          options.getBiomeBlendRadius().setValue(0);
-         options.getMipmapLevels().setValue(0);
+         options.getMipmapLevels().setValue(Math.min(mipmapLevels, 1));
          client.chunkCullingEnabled = true;
          applied = true;
       }
@@ -81,7 +81,9 @@ public final class OptimizationManager {
          options.getSimulationDistance().setValue(simulationDistance);
          options.getEntityDistanceScaling().setValue(entityDistance);
          options.getBiomeBlendRadius().setValue(biomeBlend);
-         options.getMipmapLevels().setValue(mipmapLevels);
+         if (mipmapLevels >= 0) {
+            options.getMipmapLevels().setValue(mipmapLevels);
+         }
          applied = false;
       }
    }
