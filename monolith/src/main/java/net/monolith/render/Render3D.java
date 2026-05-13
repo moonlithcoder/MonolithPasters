@@ -500,7 +500,7 @@ public final class Render3D {
          Text styled = Text.literal(line);
          float width = (float)textRenderer.getWidth(styled);
          int left = (int)(-width / 2.0F) - 5;
-         this.quad2d(matrix, (float)left, -4.0F, width + 10.0F, 13.0F, backgroundColor);
+         this.roundedQuad2d(matrix, (float)left, -5.0F, width + 10.0F, 14.0F, 2.0F, backgroundColor);
          textRenderer.draw(styled, -width / 2.0F, -1.0F, textColor, false, matrix, consumers, TextLayerType.SEE_THROUGH, 0, 15728880);
          consumers.draw();
          this.matrices.pop();
@@ -634,16 +634,25 @@ public final class Render3D {
       this.addVertex(builder, x4, y4, z4, color);
    }
 
-   private void quad2d(Matrix4f matrix, float x, float y, float width, float height, int color) {
+   private void roundedQuad2d(Matrix4f matrix, float x, float y, float width, float height, float radius, int color) {
       if (alpha(color) > 0) {
          this.setup();
-         BufferBuilder builder = Tessellator.getInstance().begin(DrawMode.QUADS, VertexFormats.POSITION_COLOR);
-         builder.vertex(matrix, x, y + height, 0.0F).color(color);
-         builder.vertex(matrix, x + width, y + height, 0.0F).color(color);
-         builder.vertex(matrix, x + width, y, 0.0F).color(color);
-         builder.vertex(matrix, x, y, 0.0F).color(color);
+         BufferBuilder builder = Tessellator.getInstance().begin(DrawMode.TRIANGLE_FAN, VertexFormats.POSITION_COLOR);
+         builder.vertex(matrix, x + width / 2.0F, y + height / 2.0F, 0.0F).color(color);
+         this.arc2d(builder, matrix, x + width - radius, y + radius, radius, -90.0F, 0.0F, color);
+         this.arc2d(builder, matrix, x + width - radius, y + height - radius, radius, 0.0F, 90.0F, color);
+         this.arc2d(builder, matrix, x + radius, y + height - radius, radius, 90.0F, 180.0F, color);
+         this.arc2d(builder, matrix, x + radius, y + radius, radius, 180.0F, 270.0F, color);
+         builder.vertex(matrix, x + width - radius, y, 0.0F).color(color);
          BufferRenderer.drawWithGlobalProgram(builder.end());
          this.teardown();
+      }
+   }
+
+   private void arc2d(BufferBuilder builder, Matrix4f matrix, float centerX, float centerY, float radius, float start, float end, int color) {
+      for (int i = 0; i <= 6; i++) {
+         float angle = (float)Math.toRadians((double)(start + (end - start) * (float)i / 6.0F));
+         builder.vertex(matrix, centerX + (float)Math.cos((double)angle) * radius, centerY + (float)Math.sin((double)angle) * radius, 0.0F).color(color);
       }
    }
 

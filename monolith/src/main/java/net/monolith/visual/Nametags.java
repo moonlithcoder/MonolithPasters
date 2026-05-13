@@ -17,6 +17,11 @@ public final class Nametags {
    private Nametags() {
    }
 
+   public static boolean shouldHideVanilla() {
+      Module module = ModuleManager.getModule("Nametags");
+      return module != null && module.enabled;
+   }
+
    public static void render(WorldRenderContext context) {
       MinecraftClient client = MinecraftClient.getInstance();
       Module module = ModuleManager.getModule("Nametags");
@@ -31,7 +36,7 @@ public final class Nametags {
             Vec3d pos = player.getPos().add(0.0, (double)player.getHeight() + 0.5, 0.0);
             double distance = Math.max(2.0, (double)client.player.distanceTo(player));
             float scale = (float)(0.022 * Math.min(2.5, distance / 4.0));
-            renderer.nametag(pos, line(player, module), scale, -1, -1996488704);
+            renderer.nametag(pos, line(player, module), scale, -1, -2006487775);
          }
       }
    }

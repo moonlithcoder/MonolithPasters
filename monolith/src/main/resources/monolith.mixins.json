@@ -13,7 +13,8 @@
     "InGameOverlayRendererMixin",
     "LightmapTextureManagerMixin",
     "MinecraftClientMixin",
-    "MinecraftClientAccessor"
+    "MinecraftClientAccessor",
+    "PlayerEntityRendererMixin"
   ],
   "client": [],
   "injectors": {
