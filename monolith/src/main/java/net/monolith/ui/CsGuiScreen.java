@@ -104,19 +104,20 @@ public class CsGuiScreen extends Screen {
             color = RenderUtils.lerpColor(color, -15658216, 0.55F);
          }
 
-         r.roundedRect((float)mx, (float)my, (float)colW, 40.0F, 8.0F, color);
-         r.roundedOutline((float)mx, (float)my, (float)colW, 40.0F, 8.0F, 0.7F, module.enabled ? this.withAlpha(this.accent, 115) : 318767103);
-         r.circle((float)(mx + 15), (float)(my + 20), 6.0F, module.enabled ? this.accent : -14407630);
-         r.text(this.textRenderer, this.trim(module.name, 12), mx + 28, my + 10, module.enabled ? -1 : -4932664, false);
-         r.text(this.textRenderer, this.hasSettings(module) ? "settings" : "toggle", mx + 28, my + 24, -9867139, false);
+         r.roundedRect((float)mx, (float)my, (float)colW, 44.0F, 8.0F, color);
+         r.roundedOutline((float)mx, (float)my, (float)colW, 44.0F, 8.0F, 0.7F, module.enabled ? this.withAlpha(this.accent, 115) : 318767103);
+         r.roundedRect((float)(mx + 8), (float)(my + 9), 3.0F, 26.0F, 2.0F, module.enabled ? this.accent : -14407630);
+         r.text(this.textRenderer, this.trim(module.name, 14), mx + 17, my + 8, module.enabled ? -1 : -4932664, false);
+         this.marquee(r, module.description, mx + 17, my + 24, colW - 25, -9867139, delta);
+         r.scissor(x - 4, y - 4, x + width + 4, y + height + 6);
          if (this.hasSettings(module)) {
-            r.text(this.textRenderer, ">", mx + colW - 14, my + 16, this.activeSettingsModule == module ? this.accent : -10590604, false);
+            r.text(this.textRenderer, ">", mx + colW - 14, my + 15, this.activeSettingsModule == module ? this.accent : -10590604, false);
          }
 
          if (left) {
-            y1 += 47;
+            y1 += 51;
          } else {
-            y2 += 47;
+            y2 += 51;
          }
       }
 
@@ -167,30 +168,42 @@ public class CsGuiScreen extends Screen {
          r.text(this.textRenderer, "settings", x + 10, y + 25, -10525069, false);
          int sy = y + 43 - this.settingsScroll;
 
+         if (!this.activeSettingsModule.modes.isEmpty()) {
+            r.roundedRect((float)(x + 7), (float)(sy - 6), (float)(panelW - 14), 34.0F, 7.0F, -16250612);
+            r.roundedOutline((float)(x + 7), (float)(sy - 6), (float)(panelW - 14), 34.0F, 7.0F, 0.6F, 285212671);
+            r.text(this.textRenderer, "Mode", x + 12, sy, -3353116, false);
+            this.marquee(r, this.activeSettingsModule.currentMode, x + 12, sy + 13, panelW - 25, this.accent, delta);
+            r.scissor(x, y, x + (int)((float)panelW * this.settingsAnim), y + 286);
+            sy += 40;
+         }
+
          for (Module.Setting setting : this.activeSettingsModule.settings.values()) {
-            r.roundedRect((float)(x + 7), (float)(sy - 6), (float)(panelW - 14), setting.color ? 32.0F : 36.0F, 7.0F, -16250612);
-            r.roundedOutline((float)(x + 7), (float)(sy - 6), (float)(panelW - 14), setting.color ? 32.0F : 36.0F, 7.0F, 0.6F, 285212671);
+            r.roundedRect((float)(x + 7), (float)(sy - 6), (float)(panelW - 14), setting.color ? 40.0F : 44.0F, 7.0F, -16250612);
+            r.roundedOutline((float)(x + 7), (float)(sy - 6), (float)(panelW - 14), setting.color ? 40.0F : 44.0F, 7.0F, 0.6F, 285212671);
             r.text(this.textRenderer, this.trim(setting.name, 13), x + 12, sy, -3353116, false);
+            this.marquee(r, setting.description, x + 12, sy + 12, panelW - 25, -10525069, delta);
+            r.scissor(x, y, x + (int)((float)panelW * this.settingsAnim), y + 286);
             if (setting.color) {
-               this.drawPalette(r, x + 12, sy + 15, panelW - 34, 7);
+               this.drawPalette(r, x + 12, sy + 23, panelW - 34, 7);
                int color = 0xFF000000 | (int)Math.rint(setting.value) & 16777215;
                r.roundedRect((float)(x + panelW - 23), (float)sy, 10.0F, 10.0F, 3.0F, color);
-               sy += 38;
+               sy += 46;
             } else {
                r.text(this.textRenderer, setting.displayValue(), x + panelW - 32, sy, this.accent, false);
                double progress = (setting.value - setting.min) / (setting.max - setting.min);
-               r.roundedRect((float)(x + 12), (float)(sy + 18), (float)(panelW - 26), 5.0F, 3.0F, -15263453);
-               r.roundedRect((float)(x + 12), (float)(sy + 18), (float)((int)((double)(panelW - 26) * progress)), 5.0F, 3.0F, this.accent);
-               r.circle((float)(x + 12 + (int)((double)(panelW - 26) * progress)), (float)(sy + 20), 3.0F, -1);
-               sy += 42;
+               r.roundedRect((float)(x + 12), (float)(sy + 26), (float)(panelW - 26), 5.0F, 3.0F, -15263453);
+               r.roundedRect((float)(x + 12), (float)(sy + 26), (float)((int)((double)(panelW - 26) * progress)), 5.0F, 3.0F, this.accent);
+               sy += 50;
             }
          }
 
          for (Module.OptionSetting option : this.activeSettingsModule.optionSettings) {
-            r.roundedRect((float)(x + 7), (float)(sy - 6), (float)(panelW - 14), (float)(18 + option.options.size() * 21), 7.0F, -16250612);
-            r.roundedOutline((float)(x + 7), (float)(sy - 6), (float)(panelW - 14), (float)(18 + option.options.size() * 21), 7.0F, 0.6F, 285212671);
+            r.roundedRect((float)(x + 7), (float)(sy - 6), (float)(panelW - 14), (float)(30 + option.options.size() * 21), 7.0F, -16250612);
+            r.roundedOutline((float)(x + 7), (float)(sy - 6), (float)(panelW - 14), (float)(30 + option.options.size() * 21), 7.0F, 0.6F, 285212671);
             r.text(this.textRenderer, this.trim(option.name, 11), x + 12, sy, -3353116, false);
-            sy += 15;
+            this.marquee(r, option.description, x + 12, sy + 12, panelW - 25, -10525069, delta);
+            r.scissor(x, y, x + (int)((float)panelW * this.settingsAnim), y + 286);
+            sy += 27;
 
             for (String value : option.options) {
                boolean selected = option.isSelected(value);
@@ -198,8 +211,8 @@ public class CsGuiScreen extends Screen {
                r.roundedRect(
                   (float)(x + 10), (float)sy, (float)(panelW - 20), 18.0F, 5.0F, selected ? this.withAlpha(this.accent, 78) : (hovered ? 419430399 : 0)
                );
-               r.circle((float)(x + 18), (float)(sy + 9), 3.0F, selected ? this.accent : -14012872);
-               r.text(this.textRenderer, this.trim(value, 12), x + 26, sy + 6, selected ? -1 : -8550504, false);
+               r.roundedRect((float)(x + 14), (float)(sy + 5), 3.0F, 8.0F, 2.0F, selected ? this.accent : -14012872);
+               r.text(this.textRenderer, this.trim(value, 14), x + 22, sy + 6, selected ? -1 : -8550504, false);
                sy += 21;
             }
 
@@ -261,7 +274,7 @@ public class CsGuiScreen extends Screen {
          boolean left = i % 2 == 0;
          int mx = left ? x : x + colW + 10;
          int my = left ? y1 : y2;
-         if (this.inside(mouseX, mouseY, mx, my, colW, 40)) {
+         if (this.inside(mouseX, mouseY, mx, my, colW, 44)) {
             if (button == 0) {
                module.toggle();
             } else if (button == 1 && this.hasSettings(module)) {
@@ -275,9 +288,9 @@ public class CsGuiScreen extends Screen {
          }
 
          if (left) {
-            y1 += 47;
+            y1 += 51;
          } else {
-            y2 += 47;
+            y2 += 51;
          }
       }
 
@@ -288,19 +301,28 @@ public class CsGuiScreen extends Screen {
       if (this.activeSettingsModule != null && !(this.settingsAnim < 0.85F) && this.inside(mouseX, mouseY, x, y, 132, 286)) {
          int sy = y + 43 - this.settingsScroll;
 
+         if (!this.activeSettingsModule.modes.isEmpty()) {
+            if (this.inside(mouseX, mouseY, x + 7, sy - 6, 118, 34) && button == 0) {
+               this.activeSettingsModule.cycleMode();
+               return true;
+            }
+
+            sy += 40;
+         }
+
          for (Module.Setting setting : this.activeSettingsModule.settings.values()) {
-            int rowH = setting.color ? 32 : 36;
+            int rowH = setting.color ? 40 : 44;
             if (this.inside(mouseX, mouseY, x + 7, sy - 6, 118, rowH) && button == 0) {
                this.draggingSetting = setting;
                this.updateDraggingSetting(mouseX, x, setting);
                return true;
             }
 
-            sy += setting.color ? 38 : 42;
+            sy += setting.color ? 46 : 50;
          }
 
          for (Module.OptionSetting option : this.activeSettingsModule.optionSettings) {
-            sy += 15;
+            sy += 27;
 
             for (String value : option.options) {
                if (this.inside(mouseX, mouseY, x + 10, sy, 112, 18) && button == 0) {
@@ -435,6 +457,22 @@ public class CsGuiScreen extends Screen {
          int x1 = x + (int)Math.round((double)width * start);
          int x2 = x + (int)Math.round((double)width * end);
          r.rect((float)x1, (float)y, (float)Math.max(1, x2 - x1), (float)height, 0xFF000000 | this.paletteColor(start));
+      }
+   }
+
+   private void marquee(Mre2D r, String text, int x, int y, int width, int color, float delta) {
+      if (text != null && !text.isEmpty() && width > 0) {
+         int textWidth = r.textWidth(this.textRenderer, text);
+         if (textWidth <= width) {
+            r.text(this.textRenderer, text, x, y, color, false);
+         } else {
+            int overflow = textWidth - width;
+            float time = (float)(System.currentTimeMillis() % 5000L) / 5000.0F;
+            int offset = (int)((Math.sin((double)(time * (float)Math.PI * 2.0F)) * 0.5 + 0.5) * (double)overflow);
+            r.scissor(x, y - 1, x + width, y + 10);
+            r.text(this.textRenderer, text, x - offset, y, color, false);
+            r.disableScissor();
+         }
       }
    }
 

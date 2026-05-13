@@ -3,10 +3,12 @@ package net.monolith.visual;
 import net.fabricmc.fabric.api.client.rendering.v1.WorldRenderContext;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.item.ItemStack;
+import net.minecraft.text.Text;
 import net.minecraft.util.math.Box;
 import net.minecraft.util.math.Vec3d;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.util.TypeFilter;
+import net.monolith.friend.FriendManager;
 import net.monolith.module.Module;
 import net.monolith.module.ModuleManager;
 import net.monolith.render.Render3D;
@@ -26,17 +28,18 @@ public final class Nametags {
             .getEntitiesByType(
                TypeFilter.instanceOf(PlayerEntity.class), area, entity -> entity != client.player && entity.isAlive() && !entity.isSpectator()
             )) {
-            Vec3d pos = player.getPos().add(0.0, (double)player.getHeight() + 0.45, 0.0);
+            Vec3d pos = player.getPos().add(0.0, (double)player.getHeight() + 0.5, 0.0);
             double distance = Math.max(2.0, (double)client.player.distanceTo(player));
-            float scale = (float)(0.02 * Math.min(2.5, distance / 4.0));
-            renderer.nametag(pos, "◆ " + line(player, module) + " ◆", scale, -1, -586873590);
+            float scale = (float)(0.022 * Math.min(2.5, distance / 4.0));
+            renderer.nametag(pos, line(player, module), scale, -1, -1996488704);
          }
       }
    }
 
    private static String line(PlayerEntity player, Module module) {
-      StringBuilder builder = new StringBuilder(player.getName().getString());
-      builder.append("  ").append(Math.round(player.getHealth() + player.getAbsorptionAmount())).append(" HP");
+      StringBuilder builder = new StringBuilder(role(player));
+      builder.append(" ").append(player.getName().getString());
+      builder.append(" §f- ").append(Math.round(player.getHealth() + player.getAbsorptionAmount())).append("HP");
       if (module.isOptionSelected("Show", "Right item")) {
          append(builder, "R", player.getMainHandStack());
       }
@@ -63,6 +66,23 @@ public final class Nametags {
    private static void append(StringBuilder builder, String side, ItemStack stack) {
       if (!stack.isEmpty()) {
          builder.append("  ").append(side).append(": ").append(stack.getName().getString());
+      }
+   }
+
+   private static String role(PlayerEntity player) {
+      if (FriendManager.isFriend(player.getName().getString())) {
+         return "§aдруг";
+      } else {
+         Text display = player.getDisplayName();
+         if (display != null) {
+            String text = display.getString().trim();
+            int space = text.indexOf(' ');
+            if (space > 0 && space < text.length() - 1 && !text.substring(0, space).equals(player.getName().getString())) {
+               return "§c" + text.substring(0, space);
+            }
+         }
+
+         return "§cкрушитель";
       }
    }
 }
