@@ -17,11 +17,6 @@ public final class Nametags {
    private Nametags() {
    }
 
-   public static boolean shouldHideVanilla() {
-      Module module = ModuleManager.getModule("Nametags");
-      return module != null && module.enabled;
-   }
-
    public static void render(WorldRenderContext context) {
       MinecraftClient client = MinecraftClient.getInstance();
       Module module = ModuleManager.getModule("Nametags");
